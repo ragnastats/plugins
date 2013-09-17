@@ -28,11 +28,11 @@ my $hooks = Plugins::addHooks(['mainLoop_post', \&loop],
 								
 								# Actor packets
 								['packet/actor_exists', \&defaultHandler],
-								['packet/actor_connected', \&defaultHandler],
-								['packet/actor_moved', \&defaultHandler],
 								['packet/actor_spawned', \&defaultHandler],
+								['packet/actor_connected', \&defaultHandler],
+								['packet/actor_display', \&verboseHandler],
+								#['packet/actor_moved', \&verboseHandler], # Duplicate of actor_display
 								#['packet/actor_died_or_disappeared', \&defaultHandler],
-								['packet/actor_display', \&defaultHandler],
 								#['packet/character_moves', \&defaultHandler],
 								['packet/actor_action', \&defaultHandler],
 								['packet/actor_info', \&defaultHandler],
@@ -236,12 +236,20 @@ sub defaultHandler
 {
 	my($hook, $args) = @_;
 	print("Hook: $hook \n");
+}
 
+sub verboseHandler
+{
+	my($hook, $args) = @_;
+	print("Hook: $hook \n");
+
+	delete($args->{KEYS});
+	
     $Data::Dumper::Terse = 0;        # Output MORE!
     $Data::Dumper::Indent = 1;       # Output whitespace
 
-#	print(Dumper(@_));
-#	print("============\n");
+	print(Dumper($args));
+	print("============\n");
 }
 
 1;
