@@ -1,4 +1,4 @@
-plugin
+Plugins
 ======
 
-The new and improved RagnaStats plugin!
+Miscellaneous plugins for OpenKore
