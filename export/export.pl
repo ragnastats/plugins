@@ -28,7 +28,7 @@ sub export
 
 	#print(Dumper(@{$char->inventory->getItems()}));
 	
-	my $export = {"inventory" => []};
+	my $export = {"inventory" => [], "storage" => []};
 	
 	foreach my $item (@{$char->inventory->getItems()})
 	{
@@ -53,9 +53,21 @@ sub export
 #		print(" - ".$item->{name}." \n - Inv Index: ".$item->{invIndex}." \n - Index: ".$item->{index}." \n - Amount: ".$item->{amount}." \n - Type: ".$item->{type}." \n ======================== \n");
 	}
 
+	for (my $i = 0; $i < @storageID; $i++)
+	{
+		next if ($storageID[$i] eq "");
+		my $item = $storage{$storageID[$i]};
+	
+		print("Name: $item->{name} \n");
+		print("Amount: $item->{amount} \n");
+		print("ID: $item->{nameID} \n");
+		print("Storage! \n============ \n");
+		push(@{$export->{storage}}, {item => $item->{nameID}, quantity => $item->{amount}});	
+	}
+
 	my $file;
 	
-	open($file, '>', 'stats/inventory-export.json'); 
+	open($file, '>', 'stats/character-export.json'); 
 	print $file to_json($export); 
 	close($file); 
  
