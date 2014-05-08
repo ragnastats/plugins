@@ -30,6 +30,9 @@ sub export
 	
 	my $export = {"inventory" => [], "storage" => []};
 	
+	# Inventory
+	########################
+	
 	foreach my $item (@{$char->inventory->getItems()})
 	{
 		print("Name: $item->{name} \n");
@@ -53,7 +56,10 @@ sub export
 #		print(" - ".$item->{name}." \n - Inv Index: ".$item->{invIndex}." \n - Index: ".$item->{index}." \n - Amount: ".$item->{amount}." \n - Type: ".$item->{type}." \n ======================== \n");
 	}
 
-	for (my $i = 0; $i < @storageID; $i++)
+	# Storage
+	########################
+	
+	for(my $i = 0; $i < @storageID; $i++)
 	{
 		next if ($storageID[$i] eq "");
 		my $item = $storage{$storageID[$i]};
@@ -65,8 +71,20 @@ sub export
 		push(@{$export->{storage}}, {item => $item->{nameID}, quantity => $item->{amount}});	
 	}
 
-	my $file;
+	# Character information
+	########################
 	
+	$export->{character} = {
+		name => $char->{'name'},
+		class => $jobs_lut{$char->{'jobID'}},
+		hp => {current => $char->{'hp'}, total => $char->{'hp_max'}},
+		sp => {current => $char->{'sp'}, total => $char->{'sp_max'}},
+		exp => {base => {current => $char->{'exp'}, total => $char->{'exp_max'}},
+				job => {current => $char->{'exp_job'}, total => $char->{'exp_job_max'}}},
+		zeny => $char->{'zeny'}
+	};
+	
+	my $file;
 	open($file, '>', 'stats/character-export.json'); 
 	print $file to_json($export); 
 	close($file); 
