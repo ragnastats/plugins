@@ -82,6 +82,7 @@ sub export
 		level => {base => $char->{'lv'}, job => $char->{'lv_job'}},
 		exp => {base => {current => $char->{'exp'}, total => $char->{'exp_max'}},
 				job => {current => $char->{'exp_job'}, total => $char->{'exp_job_max'}}},
+		weight => {current => $char->{'weight'}, total => $char->{'weight_max'}},
 		zeny => $char->{'zeny'}
 	};
 	
