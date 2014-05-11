@@ -79,6 +79,7 @@ sub export
 		class => $jobs_lut{$char->{'jobID'}},
 		hp => {current => $char->{'hp'}, total => $char->{'hp_max'}},
 		sp => {current => $char->{'sp'}, total => $char->{'sp_max'}},
+		level => {base => $char->{'lv'}, job => $char->{'lv_job'}},
 		exp => {base => {current => $char->{'exp'}, total => $char->{'exp_max'}},
 				job => {current => $char->{'exp_job'}, total => $char->{'exp_job_max'}}},
 		zeny => $char->{'zeny'}
