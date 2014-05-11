@@ -14,7 +14,7 @@ use Globals;
  
 our $drop = {};
  
-Plugins::register("Auto-drop", "Version 0.1 r1", \&unload);
+Plugins::register("Auto-drop", "Drop items randomly~", \&unload);
 my $hooks = Plugins::addHooks(['mainLoop_post', \&loop]);
  
 sub unload
@@ -24,28 +24,29 @@ sub unload
  
 sub loop
 {
-        if(Network::DirectConnection::getState() == Network::IN_GAME)
-        {      
-                if($config{autoDrop})
-                {
-                        my $time = Time::HiRes::time();
-                                               
-                        if($drop->{time} < $time)
-                        {
-                                $drop->{item} = [];
-                       
-                                foreach my $item (@{$char->inventory->getItems()})
-                                {
-                                        push(@{$drop->{item}}, $item->{invIndex});
-                                }
- 
-                                @{$drop->{item}} = List::Util::shuffle @{$drop->{item}};
-                               
-                                #print(@{$drop->{item}}[0]."n");
-                                Commands::run("drop @{$drop->{item}}[0] 1");
-                                                               
-                                $drop->{time} = $time + 0.05;
-                        }
-                }
-        }
+	if(Network::DirectConnection::getState() == Network::IN_GAME)
+	{   
+	
+		if($config{autodrop})
+		{
+			my $time = Time::HiRes::time();
+								   
+			if($drop->{time} < $time)
+			{
+				$drop->{item} = [];
+	   
+				foreach my $item (@{$char->inventory->getItems()})
+				{
+					push(@{$drop->{item}}, $item->{invIndex});
+				}
+
+				@{$drop->{item}} = List::Util::shuffle @{$drop->{item}};
+			   
+				#print(@{$drop->{item}}[0]."n");
+				Commands::run("drop @{$drop->{item}}[0] 1");
+											   
+				$drop->{time} = $time + $config{autodrop_timeout};
+			}
+		}
+	}
 }
