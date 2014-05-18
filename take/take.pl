@@ -23,17 +23,18 @@ our $moving = 0;
 our $movingTo = {};
 
 Commands::register(["itemlist", "Items?", \&items]);
+Commands::register(["itemclear", "Items?", \&clear]);
 Commands::register(["distance", "Items?", \&dist]);
 Commands::register(["spiral", "Items?", \&spiral]);
 
 Plugins::register("Take", "Take all the things!", \&unload);
 my $hooks = Plugins::addHooks(['mainLoop_post', \&loop],
 								# Item packets
-								['packet/item_exists', \&itemAppeared],
+							#	['packet/item_exists', \&itemAppeared],
 								['packet/item_appeared', \&itemAppeared],
 								['packet/item_disappeared', \&itemDisappeared],
-								['packet/inventory_item_added', \&defaultHandler],
-								['packet/use_item', \&defaultHandler],
+								#['packet/inventory_item_added', \&defaultHandler],
+								#['packet/use_item', \&defaultHandler],
 								# Character packets
 								['packet/character_moves', \&characterMoved]
 								);
@@ -54,7 +55,7 @@ sub loop
 	
 	my $time = Time::HiRes::time();
 	
-	if($time > $timeout)
+	if($time > $timeout and $config{autotake})
 	{
 		$timeout = $time + 0.1;
 		
@@ -64,10 +65,14 @@ sub loop
 		if($moving > 0)
 		{
 			my $distance = distance(calcPosition($char), $movingTo);
-		
+			
 			print("Distance: $distance\n");
-		
-			if($distance <= 1)
+			
+			if($distance > $config{take_distance})
+			{
+				$moving = 0;
+			}		
+			elsif($distance <= 1)
 			{
 				$moving--;
 				spiral();
@@ -91,7 +96,7 @@ sub look
 		
 		my $distance = distance(calcPosition($char), $position);
 		
-		if($distance > 1)
+		if($distance > 0.5)
 		{
 			$moving = 5;
 
@@ -138,7 +143,7 @@ sub spiral
 	
 	my $count = 1;
 	
-	for(my $step = 1; $step < 20; $step++)
+	for(my $step = 1; $step < $config{take_step}; $step++)
 	{
 		my $previous = $directions->[-1];
 		my $direction = shift @{$directions};
@@ -197,11 +202,11 @@ sub dist
 {
 	my $pos = calcPosition($char);
 	
-	print("Current position: $pos->{x}, $pos->{y} \n");
+#	print("Current position: $pos->{x}, $pos->{y} \n");
 
 	while(my($id, $item) = each(%{$iList}))
 	{
-		print("Distance: ".distance($pos, {x => $item->{x}, y => $item->{y}})." \n");
+#		print("Distance: ".distance($pos, {x => $item->{x}, y => $item->{y}})." \n");
 	}	
 }
 
@@ -238,7 +243,7 @@ sub characterMoved
 sub itemAppeared
 {
 	my($hook, $args) = @_;
-	print("Hook: $hook \n");
+	#print("Hook: $hook \n");
 
 	delete($args->{KEYS});
 	
@@ -265,16 +270,19 @@ sub itemAppeared
 	};
 	
 	my $items = scalar keys %{$iList};
-	print("$items items on screen.\n");
+#	print("$items items on screen.\n");
 	
 	# More more!
-	spiral();
+	if($config{autotake})
+	{
+		spiral();
+	}
 }
 
 sub itemDisappeared
 {
 	my($hook, $args) = @_;
-	print("Hook: $hook \n");
+#	print("Hook: $hook \n");
 
 	delete($args->{KEYS});
 	
@@ -303,53 +311,24 @@ sub itemDisappeared
 	delete($iList->{$args->{ID}});
 	
 	my $items = scalar keys %{$iList};
-	print("$items items on screen.\n");
+#	print("$items items on screen.\n");
 	
 	# Are there still items? Pick them up!
-	spiral();
-}
-
-sub serverHandler
-{
-	my($hook, $args) = @_;
-	print("Hook: $hook \n");
-	
-	if($hook eq "packet/account_server_info")
+	if($config{autotake})
 	{
-		my $server_info =
-		{
-			'accountID' => $args->{accountID},
-			'accountSex' => $args->{accountSex},
-			'servers' => $args->{servers}
-		};
-		
-		$Data::Dumper::Indent = 0;       # Don't output whitespace	
-		print(Dumper($server_info) . "\n");
-	}
-	else
-	{
-		print(Dumper($args));
+		spiral();
 	}
 }
 
-sub defaultHandler
+sub clear
 {
-	my($hook, $args) = @_;
-	print("Hook: $hook \n");
-}
-
-sub verboseHandler
-{
-	my($hook, $args) = @_;
-	print("Hook: $hook \n");
-
-	delete($args->{KEYS});
-	
-    $Data::Dumper::Terse = 0;        # Output MORE!
-    $Data::Dumper::Indent = 1;       # Output whitespace
-
-	print(Dumper($args));
-	print("============\n");
+	$iList = {};
+	$iDist = {};
+	$iPos = {};
+	$pos_from = {x => 0, y => 0};
+	$pos_to = {x => 0, y => 0};
+	$moving = 0;
+	$movingTo = {};
 }
 
 
