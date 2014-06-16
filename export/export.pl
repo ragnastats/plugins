@@ -15,10 +15,33 @@ use Network;
 use Globals;
 use Utils;
 
-Commands::register(["export", "Export some data!", \&export]);
+Commands::register(["export", "Export some data!", \&cmd_export]);
 
 Plugins::register("Export", "Export some data!", \&unload);
 my $hooks = Plugins::addHooks(['mainLoop_post', \&loop]);
+
+sub cmd_export
+{
+	my($cmd, $args) = @_;
+	
+	if($args eq "debug")
+	{
+		debug();
+	}
+	else
+	{
+		export();
+	}
+}
+
+sub debug
+{
+	my @items = $char->inventory->getItems();
+	foreach my $item (@items)
+	{
+		print(Dumper($item));
+	}
+}
 
 sub export	
 {
