@@ -45,6 +45,16 @@ sub debug
 	{
 		print $file Dumper($item);
 	}
+
+	print $file "\n ================================================================== \n";
+	
+	for(my $i = 0; $i < @storageID; $i++)
+	{
+		next if ($storageID[$i] eq "");
+		my $item = $storage{$storageID[$i]};
+		
+		print $file Dumper($item);
+	}
 	close($file); 
 
 	print("Debug output saved to debug.log\n");
@@ -65,25 +75,7 @@ sub export
 	
 	foreach my $item (@{$char->inventory->getItems()})
 	{
-		print("Name: $item->{name} \n");
-		print("Amount: $item->{amount} \n");
-		print("ID: $item->{nameID} \n");
-		print("Sprite: $item->{sprite_id} \n");
-		print("Type: $item->{type} \n");
-		print("Equip Type: $item->{type_equip} \n");
-		print("Identified: $item->{identified} \n");
-		print("Broken: $item->{broken} \n");
-		print("Bind On Equip: $item->{bindOnEquipType} \n");
-		print("Upgrade: $item->{upgrade} \n");
-		print("Cards: $item->{cards} \n");
-		print("Equipped: $item->{equipped} \n");
-		print("Expire: $item->{cards} \n");
-		print("Actor Type: $item->{actorType} \n");
-		print("=============\n");
-
-		push(@{$export->{inventory}}, {item => $item->{nameID}, quantity => $item->{amount}});
-	
-#		print(" - ".$item->{name}." \n - Inv Index: ".$item->{invIndex}." \n - Index: ".$item->{index}." \n - Amount: ".$item->{amount}." \n - Type: ".$item->{type}." \n ======================== \n");
+		push(@{$export->{inventory}}, {item => $item->{nameID}, quantity => $item->{amount}});	
 	}
 
 	# Storage
@@ -94,10 +86,6 @@ sub export
 		next if ($storageID[$i] eq "");
 		my $item = $storage{$storageID[$i]};
 	
-		print("Name: $item->{name} \n");
-		print("Amount: $item->{amount} \n");
-		print("ID: $item->{nameID} \n");
-		print("Storage! \n============ \n");
 		push(@{$export->{storage}}, {item => $item->{nameID}, quantity => $item->{amount}});	
 	}
 
@@ -121,9 +109,7 @@ sub export
 	print $file to_json($export); 
 	close($file); 
  
-	print("Export complete!\n");
- 
-#	print(Dumper($char->inventory->getItems())."\n");
+	print("Export complete!\n"); 
 }
  
 sub unload
