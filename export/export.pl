@@ -37,10 +37,17 @@ sub cmd_export
 sub debug
 {
 	my @items = $char->inventory->getItems();
+
+	my $file;
+	open($file, '>', 'stats/debug.log'); 
+  
 	foreach my $item (@items)
 	{
-		print(Dumper($item));
+		print $file Dumper($item);
 	}
+	close($file); 
+
+	print("Debug output saved to debug.log\n");
 }
 
 sub export	
