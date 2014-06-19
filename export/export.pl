@@ -18,15 +18,16 @@ use Utils;
 Commands::register(["export", "Export some data!", \&cmd_export]);
 
 Plugins::register("Export", "Export some data!", \&unload);
-my $hooks = Plugins::addHooks(['mainLoop_post', \&loop]);
+#my $hooks = Plugins::addHooks(['mainLoop_post', \&loop]);
 
 sub cmd_export
 {
 	my($cmd, $args) = @_;
+	my @arg = split(" ", $args);
 	
-	if($args eq "debug")
+	if($arg[0] eq "debug")
 	{
-		debug();
+		debug($arg[1]);
 	}
 	else
 	{
@@ -36,13 +37,29 @@ sub cmd_export
 
 sub debug
 {
-	my @items = $char->inventory->getItems();
-
+	my($debug) = @_;
+	my $items = @{$char->inventory->getItems()};
 	my $file;
-	open($file, '>', 'stats/debug.log'); 
-  
-	foreach my $item (@items)
+	
+	if($debug)
 	{
+		open($file, '>', "stats/debug-$debug.log"); 
+	}
+	else
+	{
+		open($file, '>', 'stats/debug.log'); 
+	}
+	
+	foreach my $item (@{$items})
+	{
+		if($debug == "equipped")
+		{
+			unless($item->{equipped})
+			{
+				next;
+			}
+		}
+		
 		print $file Dumper($item);
 	}
 
@@ -50,6 +67,11 @@ sub debug
 	
 	for(my $i = 0; $i < @storageID; $i++)
 	{
+		if($debug == "equipped")
+		{
+			next;
+		}
+	
 		next if ($storageID[$i] eq "");
 		my $item = $storage{$storageID[$i]};
 		
@@ -57,7 +79,7 @@ sub debug
 	}
 	close($file); 
 
-	print("Debug output saved to debug.log\n");
+	print("Debug output saved.\n");
 }
 
 sub export	
@@ -114,11 +136,7 @@ sub export
  
 sub unload
 {
-	Plugins::delHooks($hooks);
+#	Plugins::delHooks($hooks);
 }
 
-sub loop
-{
-
-}
-
+1;
