@@ -7,16 +7,25 @@ use Storable;
 
 # Kore includes
 use Plugins;
+use Globals;
 use Match;
 
 our $please = {};
+
+#		'00E7' => ['deal_begin', 'C', [qw(type)]],
+#		'00E9' => ['deal_add_other', 'V v C3 a8', [qw(amount nameID identified broken upgrade cards)]],
+#		'00EA' => ['deal_add_you', 'v C', [qw(index fail)]],
+#		'00EC' => ['deal_finalize', 'C', [qw(type)]],
+	
 
 Plugins::register("Please", "Everything Please?", \&unload);
 my $hooks = Plugins::addHooks(["packet_pubMsg", \&parseChat],
 								["packet_partyMsg", \&parseChat],
 								["packet_guildMsg", \&parseChat],
 								["packet_selfChat", \&parseChat],
-								["packet_privMsg", \&parseChat]);
+								["packet_privMsg", \&parseChat],
+								["packet/deal_begin", \&deal_begin],
+								["packet/deal_finalize", \&deal_finalize]);
 
 								
 sub unload
@@ -58,6 +67,28 @@ sub parseChat
 			Commands::run("deal $player->{binID}");
 		}
 	}
+}
+
+sub deal_begin
+{
+	my($hook, $args) = @_;
+	
+	if($args->{type} == 3)
+	{
+		# Immediately finalize the deal once opened
+		$messageSender->sendDealFinalize();
+	}
+}
+
+sub deal_finalize
+{
+	my($hook, $args) = @_;
+	
+	if($args->{type} == 1)
+	{
+		# Immediately accept the deal
+		$messageSender->sendDealTrade();
+	}	
 }
 
 1;
