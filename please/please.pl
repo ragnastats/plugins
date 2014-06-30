@@ -73,7 +73,7 @@ sub deal_begin
 {
 	my($hook, $args) = @_;
 	
-	if($args->{type} == 3)
+	if($args->{type} == 3 and $config{autodeal})
 	{
 		# Immediately finalize the deal once opened
 		$messageSender->sendDealFinalize();
@@ -84,7 +84,7 @@ sub deal_finalize
 {
 	my($hook, $args) = @_;
 	
-	if($args->{type} == 1)
+	if($args->{type} == 1 and $config{autodeal})
 	{
 		# Immediately accept the deal
 		$messageSender->sendDealTrade();
