@@ -31,13 +31,10 @@ sub talk
 	{
 		# Sanitize regex in search string
 		$search =~ s/[-\\.,_*+?^\$[\](){}!=|]/\\$&/g;
-		
-	
+			
 		if($npc->name =~ /$search/i)
 		{
-		print(Dumper($npc));
-			#my $npcID = $npc->binID;
-			#Commands::run("talk $npcID");
+			Commands::run("talk $npc->{binID}");
 		}		
 	}
 }
