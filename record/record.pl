@@ -40,30 +40,31 @@ sub unload
 sub loop
 {
 	my $time = time();
-
-    # Should do some sort of timing thing here?
-    # Also wait until arrival for movement?
-    
-    if($status eq "replay" and $timeout < $time and !$moving)
-    {
-        # Increment the step and run that line
-		
-		if($step < scalar(@replay))
+    	
+	# Make sure we're in game!
+	if($net->getState() == Network::IN_GAME)
+	{
+		if($status eq "replay" and $timeout < $time and !$moving)
 		{
-			my @action = split(" ", $replay[$step]);
-		
-			if($action[0] eq "move")
+			# Increment the step and run that line
+			
+			if($step < scalar(@replay))
 			{
-				$moving = 1;
+				my @action = split(" ", $replay[$step]);
+			
+				if($action[0] eq "move")
+				{
+					$moving = 1;
+				}
+				
+				Commands::run($replay[$step]);
+				$step++;
 			}
 			
-			Commands::run($replay[$step]);
-			$step++;
+			# Set the timeout ^_~
+			$timeout = $time;
 		}
-		
-		# Set the timeout ^_~
-		$timeout = $time;
-    }
+	}
 }
 
 sub command
@@ -82,10 +83,6 @@ sub command
 
 sub route
 {
-    my($hook, $args) = @_;
-	
-	print("$hook \n");
-	print(Dumper($args));
 	# This hook is called when kore finishes moving
 	$moving = 0;
 }
