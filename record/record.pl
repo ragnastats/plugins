@@ -15,6 +15,7 @@ our $status; # The current status of the plugin
 our $filename; # The filename we're currently reading from / writing to
 our $step; # The line number we're on when replaying
 our $timeout; # The last time we looped
+our $moving; # Are we moving or not?
 our @record;
 our @replay;
  
@@ -23,12 +24,18 @@ Commands::register(["replay", "Usage: replay [action] [input file name]", \&repl
 Plugins::register("NPC Talk", "Talk to NPCs by Name", \&unload);
 
 my $hooks = Plugins::addHooks(  ['mainLoop_post', \&loop],
-                                ['Commands::run/pre', \&command]);
+                                ['Commands::run/pre', \&command],
+								['route', \&route]);
 
 sub unload
 {
     Plugins::delHooks($hooks);
 }
+
+
+#
+# Hook functions
+################################
 
 sub loop
 {
@@ -37,12 +44,19 @@ sub loop
     # Should do some sort of timing thing here?
     # Also wait until arrival for movement?
     
-    if($status eq "replay" and $timeout < $time)
+    if($status eq "replay" and $timeout < $time and !$moving)
     {
         # Increment the step and run that line
 		
 		if($step < scalar(@replay))
 		{
+			my @action = split(" ", $replay[$step]);
+		
+			if($action[0] eq "move")
+			{
+				$moving = 1;
+			}
+			
 			Commands::run($replay[$step]);
 			$step++;
 		}
@@ -65,6 +79,22 @@ sub command
 		}
 	}
 }
+
+sub route
+{
+    my($hook, $args) = @_;
+	
+	print("$hook \n");
+	print(Dumper($args));
+	# This hook is called when kore finishes moving
+	$moving = 0;
+}
+
+
+
+#
+# Miscellaneous functions
+################################
 
 # Ensure a recordings directory exists on load
 # TODO: Actually make this work?
@@ -126,7 +156,7 @@ sub record
     elsif($action[0] eq "save")
     {
 		if($action[1]) {
-			$filename = $action[1];
+			$filename = $action[1].".record";
 		}
 
 		# Only save when there's a filename defined
