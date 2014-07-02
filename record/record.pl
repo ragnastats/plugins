@@ -3,7 +3,7 @@ package Record;
 # Perl includes
 use strict;
 use Data::Dumper;
- 
+
 # Kore includes
 use Settings;
 use Plugins;
@@ -14,6 +14,7 @@ use Log;
 our $status; # The current status of the plugin
 our $filename; # The filename we're currently reading from / writing to
 our $step; # The line number we're on when replaying
+our $timeout; # The last time we looped
 our @record;
 our @replay;
  
@@ -31,12 +32,23 @@ sub unload
 
 sub loop
 {
+	my $time = time();
+
     # Should do some sort of timing thing here?
     # Also wait until arrival for movement?
     
-    if($status eq "replay")
+    if($status eq "replay" and $timeout < $time)
     {
         # Increment the step and run that line
+		
+		if($step < scalar(@replay))
+		{
+			Commands::run($replay[$step]);
+			$step++;
+		}
+		
+		# Set the timeout ^_~
+		$timeout = $time;
     }
 }
 
@@ -44,19 +56,21 @@ sub command
 {
     my($hook, $action) = @_;
 
-    print("$hook \n");
-    print(Dumper($action));
-
     if($status eq "record")
     {
-        # Push command to @record
-    }
+		# Don't record recordings!
+		if($action->{switch} !~ /record|replay/i)
+		{
+			push(@record, "$action->{switch} $action->{args}");
+		}
+	}
 }
 
 # Ensure a recordings directory exists on load
+# TODO: Actually make this work?
 if(-d 'recordings')
 {
-    mkdir 'recordings', 0755;
+    mkdir('recordings', 0755);
 }
 
 # Function to format filenames
@@ -67,10 +81,10 @@ sub filename
     # Set the filename to the current time if none is specified
     if($file eq "")
     {
-        $file = strftime "%F_%H-%M-%S", localtime;
+        $file = time();
     }
         
-    return $file."record";
+    return $file.".record";
 }
 
 
@@ -105,21 +119,33 @@ sub record
     {
         &record_stop;
     }
+	elsif($action[0] eq "print")
+	{
+		print(Dumper(@record));
+	}
     elsif($action[0] eq "save")
     {
-        $filename = filename($action[1]);
+		if($action[1]) {
+			$filename = $action[1];
+		}
 
-        my $fh;
-        open($fh, '>', "recordings/$filename"); 
+		# Only save when there's a filename defined
+		if($filename)
+		{
+			my $fh;
+			open($fh, '>', "recordings/$filename"); 
 
-        foreach my $command (@record)
-        {
-            print $fh "$command\n";
-        }
+			foreach my $command (@record)
+			{
+				print "Writing $command\n";
+				print $fh "$command\n";
+			}
 
-        close($fh);
-        
-        Log::message "Record saved - $filename \n";
+			close($fh);
+			
+			Log::message "Record saved - $filename \n";
+		}
+		
         &record_stop;
     }
     elsif($action[0] eq "clear")
@@ -156,8 +182,27 @@ sub replay
 
     if($action[0] eq "start")
     {
-        $filename = filename($action[1]);
-        &replay_start;
+        $filename = ($action[1]) ? $action[1] : "";
+		
+		if($filename)
+		{
+			$filename .= ".record";
+			$step = 0;
+		
+			my $fh;
+			open($fh, '<', "recordings/$filename"); 
+			@replay = ();
+			
+			while(<$fh>)
+			{
+				chomp;
+				push @replay, $_;
+			}
+			
+			close($fh);
+		
+			&replay_start;
+		}
     }
     elsif($action[0] eq "stop") 
     {
