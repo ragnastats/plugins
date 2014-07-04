@@ -25,7 +25,8 @@ Plugins::register("NPC Talk", "Talk to NPCs by Name", \&unload);
 
 my $hooks = Plugins::addHooks(  ['mainLoop_post', \&loop],
                                 ['Commands::run/pre', \&command],
-								['route', \&route]);
+								['route', \&route],
+								['packet/map_change', \&map_change]);
 
 sub unload
 {
@@ -62,7 +63,7 @@ sub loop
 			}
 			
 			# Set the timeout ^_~
-			$timeout = $time;
+			$timeout = $time + 3;
 		}
 	}
 }
@@ -87,6 +88,13 @@ sub route
 	$moving = 0;
 }
 
+sub map_change
+{
+   my($hook, $args) = @_;
+   
+	$timeout = time() + 5;
+	$moving = 0;
+}
 
 
 #
@@ -214,6 +222,7 @@ sub replay
 		if($filename)
 		{
 			$filename .= ".record";
+			$moving = 0;
 			$step = 0;
 		
 			my $fh;
