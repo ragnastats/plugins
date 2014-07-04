@@ -15,6 +15,7 @@ use Globals;
 use Utils;
 
 Commands::register(["plop", "Storage lmao", \&storage]);
+Commands::register(["unplop", "Anti-storageeee", \&unplop]);
 
 Plugins::register("Storage", "Storage Lmao", \&unload);
 my $hooks = Plugins::addHooks(['mainLoop_post', \&loop]);
@@ -27,6 +28,16 @@ sub storage
 	{
 #		print("Wow $1 !\n");
 		Commands::run("storage add $i");
+	}
+}
+
+sub unplop
+{
+	my @take = ('Butterfly Wing', 'Strawberry', 'White Potion', 'Blue Potion', 'Empty Bottle');
+	
+	foreach(@take)
+	{
+		Commands::run("storage get $_");
 	}
 }
  
