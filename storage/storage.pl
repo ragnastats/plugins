@@ -33,11 +33,23 @@ sub storage
 
 sub unplop
 {
-	my @take = ('Butterfly Wing', 'Strawberry', 'White Potion', 'Blue Potion', 'Empty Bottle');
+	my @take = ('Butterfly Wing', 'Fly Wing', 'Strawberry', 'White Potion', 'Blue Potion', 'Empty Bottle', ['Green Herb', 5]);
 	
 	foreach(@take)
 	{
-		Commands::run("storage get $_");
+		my $item = $_;
+		
+		print("$item\n");
+		
+		if(ref($item) eq "ARRAY")
+		{
+			my($item, $quantity) = @{$_};
+			Commands::run("storage get $item $quantity")
+		}
+		else
+		{
+			Commands::run("storage get $item");
+		}		
 	}
 }
  
