@@ -33,7 +33,17 @@ sub storage
 
 sub unplop
 {
-	my @take = ('Butterfly Wing', 'Fly Wing', 'Strawberry', 'White Potion', 'Blue Potion', 'Empty Bottle', ['Green Herb', 5]);
+	my @take = (
+		['Butterfly Wing', 15],
+		['Fly Wing', 25], 
+		['Yggdrasil Leaf', 5],
+		['Strawberry', 10], 
+		['White Potion', 5], 
+		['Blue Potion', 5], 
+		['Empty Bottle', 10], 
+		['Green Herb', 5],
+		['Blue Gemstone', 100]
+	);
 	
 	foreach(@take)
 	{
