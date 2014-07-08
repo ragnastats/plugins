@@ -1,4 +1,4 @@
-package Storage;
+package Plop;
  
 # Perl includes
 use strict;
@@ -14,13 +14,13 @@ use Network;
 use Globals;
 use Utils;
 
-Commands::register(["plop", "Storage lmao", \&storage]);
-Commands::register(["unplop", "Anti-storageeee", \&unplop]);
+Commands::register(["plop", "Plop lmao", \&plop]);
+Commands::register(["unplop", "Anti-storage", \&unplop]);
 
-Plugins::register("Storage", "Storage Lmao", \&unload);
+Plugins::register("Plop", "Plop items into storage", \&unload);
 my $hooks = Plugins::addHooks(['mainLoop_post', \&loop]);
 
-sub storage
+sub plop
 {
 	my($command, $count) = @_;	
 	
