@@ -41,9 +41,14 @@ sub debug
 	my $items = @{$char->inventory->getItems()};
 	my $file;
 	
-	if($debug eq 'char')
+	if($debug eq "char")
 	{
 		print(Dumper($char));
+	}
+	elsif($debug eq "field")
+	{
+		my $pos = calcPosition($char);	
+		print "$field->{baseName} ( $field->{width} / $field->{height} ) - $pos->{x}, $pos->{y}	$char->{look}->{body}\n";
 	}
 	else
 	{
@@ -121,6 +126,8 @@ sub export
 	# Character information
 	########################
 	
+	my $pos = calcPosition($char);
+	
 	$export->{character} = {
 		name => $char->{'name'},
 		class => $jobs_lut{$char->{'jobID'}},
@@ -130,7 +137,10 @@ sub export
 		exp => {base => {current => $char->{'exp'}, total => $char->{'exp_max'}},
 				job => {current => $char->{'exp_job'}, total => $char->{'exp_job_max'}}},
 		weight => {current => $char->{'weight'}, total => $char->{'weight_max'}},
-		zeny => $char->{'zeny'}
+		zeny => $char->{'zeny'},
+		map => {name => $field->{baseName}, width => $field->{width}, height => $field->{height}},
+		pos => $pos,
+		look => $char->{look}->{body}
 	};
 	
 	my $file;
