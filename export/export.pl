@@ -41,45 +41,52 @@ sub debug
 	my $items = @{$char->inventory->getItems()};
 	my $file;
 	
-	if($debug)
+	if($debug eq 'char')
 	{
-		open($file, '>', "stats/debug-$debug.log"); 
+		print(Dumper($char));
 	}
 	else
 	{
-		open($file, '>', 'stats/debug.log'); 
-	}
-	
-	foreach my $item (@{$items})
-	{
-		if($debug == "equipped")
+		if($debug)
 		{
-			unless($item->{equipped})
+			open($file, '>', "stats/debug-$debug.log"); 
+		}
+		else
+		{
+			open($file, '>', 'stats/debug.log'); 
+		}
+		
+		foreach my $item (@{$items})
+		{
+			if($debug == "equipped")
+			{
+				unless($item->{equipped})
+				{
+					next;
+				}
+			}
+			
+			print $file Dumper($item);
+		}
+
+		print $file "\n ================================================================== \n";
+		
+		for(my $i = 0; $i < @storageID; $i++)
+		{
+			if($debug == "equipped")
 			{
 				next;
 			}
-		}
 		
-		print $file Dumper($item);
-	}
-
-	print $file "\n ================================================================== \n";
-	
-	for(my $i = 0; $i < @storageID; $i++)
-	{
-		if($debug == "equipped")
-		{
-			next;
+			next if ($storageID[$i] eq "");
+			my $item = $storage{$storageID[$i]};
+			
+			print $file Dumper($item);
 		}
-	
-		next if ($storageID[$i] eq "");
-		my $item = $storage{$storageID[$i]};
-		
-		print $file Dumper($item);
-	}
-	close($file); 
+		close($file); 
 
-	print("Debug output saved.\n");
+		print("Debug output saved.\n");
+	}
 }
 
 sub export	
