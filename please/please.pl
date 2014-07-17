@@ -51,20 +51,34 @@ sub parseChat
 		$please->{timeout} = $time + 30;
 	}
 	
-	if($chat->{Msg} =~ m/invite|party/ and $please->{timeout} > $time)
+	if($chat->{Msg} =~ m/\b(invite|party)\b/ and $please->{timeout} > $time)
 	{
 		# Sanitize usernames to prevent command execution xD
 		$chat->{MsgUser} =~ s/;/\\;/g;
 		Commands::run("party request $chat->{MsgUser}");
 	}
 	
-	if($chat->{Msg} =~ m/deal/ and $please->{timeout} > $time)
+	if($chat->{Msg} =~ m/\bdeal\b/ and $please->{timeout} > $time)
 	{
 		my $player = Match::player($chat->{MsgUser});
 		
 		if($player)
 		{
 			Commands::run("deal $player->{binID}");
+		}
+	}
+		
+	if($chat->{Msg} =~ m/\b(sit|stand|kis|lv|heh|no1|rice|gg|fsh|awsm)\b/ and $please->{timeout} > $time)
+	{
+		my $request = $1;
+
+		if($request eq "sit" or $request eq "stand")
+		{
+			Commands::run($request);
+		}
+		else
+		{
+			Commands::run("e $request");
 		}
 	}
 }
