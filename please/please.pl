@@ -45,6 +45,9 @@ sub parseChat
 		$chat->{Msg} = $chat->{msg};
 		$chat->{MsgUser} = $chat->{user};
 	}	
+
+	# Sanitize usernames to prevent command execution xD
+	$chat->{MsgUser} =~ s/;/\\;/g;
 	
 	if($chat->{Msg} =~ m/p+l+e+a+s+e*/)
 	{
@@ -53,8 +56,6 @@ sub parseChat
 	
 	if($chat->{Msg} =~ m/\b(invite|party)\b/ and $please->{timeout} > $time)
 	{
-		# Sanitize usernames to prevent command execution xD
-		$chat->{MsgUser} =~ s/;/\\;/g;
 		Commands::run("party request $chat->{MsgUser}");
 	}
 	
@@ -68,13 +69,21 @@ sub parseChat
 		}
 	}
 		
-	if($chat->{Msg} =~ m/\b(sit|stand|kis|lv|heh|no1|rice|gg|fsh|awsm)\b/ and $please->{timeout} > $time)
+	if($chat->{Msg} =~ m/\b(sit|stand|kis|lv|heh|no1|rice|gg|fsh|awsm|slur|ho|thx|omg|go|sob|pif|meh|shy|spin|fsh|sigh|dum|hum|oops|spit|panic|follow|look (?:[0-9]+))\b/ and $please->{timeout} > $time)
 	{
-		my $request = $1;
+		my ($request, $option) = split(' ', $1);
 
 		if($request eq "sit" or $request eq "stand")
 		{
 			Commands::run($request);
+		}
+		elsif($request eq "follow")
+		{
+			Commands::run("follow $chat->{MsgUser}");
+		}
+		elsif($request eq "look")
+		{
+			Commands::run("$request $option");
 		}
 		else
 		{
