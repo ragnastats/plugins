@@ -12,11 +12,6 @@ use Match;
 
 our $please = {};
 
-#		'00E7' => ['deal_begin', 'C', [qw(type)]],
-#		'00E9' => ['deal_add_other', 'V v C3 a8', [qw(amount nameID identified broken upgrade cards)]],
-#		'00EA' => ['deal_add_you', 'v C', [qw(index fail)]],
-#		'00EC' => ['deal_finalize', 'C', [qw(type)]],
-	
 
 Plugins::register("Please", "Everything Please?", \&unload);
 my $hooks = Plugins::addHooks(["packet_pubMsg", \&parseChat],
@@ -79,7 +74,10 @@ sub parseChat
 		}
 		elsif($request eq "follow")
 		{
-			Commands::run("follow $chat->{MsgUser}");
+			if($config{please_follow})
+			{
+				Commands::run("follow $chat->{MsgUser}");
+			}
 		}
 		elsif($request eq "look")
 		{
