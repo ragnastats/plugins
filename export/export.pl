@@ -94,54 +94,65 @@ sub debug
 	}
 }
 
+sub character_export
+{
+    my $export = {"inventory" => [], "storage" => []};
+    
+    # Inventory
+    ########################
+    
+    foreach my $item (@{$char->inventory->getItems()})
+    {
+        push(@{$export->{inventory}}, {
+            'item' => $item->{nameID}, 
+            'quantity' => $item->{amount},
+            'equipped' => $item->{equipped},
+            'type' => {'inventory' => $item->{type}, 'equip' => $item->{type_equip}}
+        });
+    }
+
+    # Storage
+    ########################
+    
+    for(my $i = 0; $i < @storageID; $i++)
+    {
+        next if ($storageID[$i] eq "");
+        my $item = $storage{$storageID[$i]};
+    
+        push(@{$export->{storage}}, {item => $item->{nameID}, quantity => $item->{amount}});
+    }
+
+    # Character information
+    ########################
+    
+    my $pos = calcPosition($char);
+    
+    $export->{character} = {
+        name => $char->{'name'},
+        class => $jobs_lut{$char->{'jobID'}},
+        hp => {current => $char->{'hp'}, total => $char->{'hp_max'}},
+        sp => {current => $char->{'sp'}, total => $char->{'sp_max'}},
+        level => {base => $char->{'lv'}, job => $char->{'lv_job'}},
+        exp => {base => {current => $char->{'exp'}, total => $char->{'exp_max'}},
+                job => {current => $char->{'exp_job'}, total => $char->{'exp_job_max'}}},
+        weight => {current => $char->{'weight'}, total => $char->{'weight_max'}},
+        zeny => $char->{'zeny'},
+        map => {name => $field->{baseName}, width => $field->{width}, height => $field->{height}},
+        pos => $pos,
+        look => $char->{look}->{body}
+    };
+    
+    return $export;
+}
+
+
 sub export	
 {
     $Data::Dumper::Terse = 0;        # Output MORE!
     $Data::Dumper::Indent = 1;       # Output whitespace
     $Data::Dumper::Maxdepth = 10;       # Output whitespace
 
-	#print(Dumper(@{$char->inventory->getItems()}));
-	
-	my $export = {"inventory" => [], "storage" => []};
-	
-	# Inventory
-	########################
-	
-	foreach my $item (@{$char->inventory->getItems()})
-	{
-		push(@{$export->{inventory}}, {item => $item->{nameID}, quantity => $item->{amount}});	
-	}
-
-	# Storage
-	########################
-	
-	for(my $i = 0; $i < @storageID; $i++)
-	{
-		next if ($storageID[$i] eq "");
-		my $item = $storage{$storageID[$i]};
-	
-		push(@{$export->{storage}}, {item => $item->{nameID}, quantity => $item->{amount}});	
-	}
-
-	# Character information
-	########################
-	
-	my $pos = calcPosition($char);
-	
-	$export->{character} = {
-		name => $char->{'name'},
-		class => $jobs_lut{$char->{'jobID'}},
-		hp => {current => $char->{'hp'}, total => $char->{'hp_max'}},
-		sp => {current => $char->{'sp'}, total => $char->{'sp_max'}},
-		level => {base => $char->{'lv'}, job => $char->{'lv_job'}},
-		exp => {base => {current => $char->{'exp'}, total => $char->{'exp_max'}},
-				job => {current => $char->{'exp_job'}, total => $char->{'exp_job_max'}}},
-		weight => {current => $char->{'weight'}, total => $char->{'weight_max'}},
-		zeny => $char->{'zeny'},
-		map => {name => $field->{baseName}, width => $field->{width}, height => $field->{height}},
-		pos => $pos,
-		look => $char->{look}->{body}
-	};
+    my $export = character_export();
 	
 	my $file;
 	open($file, '>', 'stats/character-export.json'); 
