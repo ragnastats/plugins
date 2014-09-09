@@ -20,7 +20,8 @@ my $hooks = Plugins::addHooks(["packet_pubMsg", \&parseChat],
                                 ["packet_selfChat", \&parseChat],
                                 ["packet_privMsg", \&parseChat],
                                 ["packet/deal_begin", \&deal_begin],
-                                ["packet/deal_finalize", \&deal_finalize]);
+                                ["packet/deal_finalize", \&deal_finalize],
+                                ["packet/party_join", \&party_handler]);
 
                                 
 sub unload
@@ -109,7 +110,21 @@ sub deal_finalize
     {
         # Immediately accept the deal
         $messageSender->sendDealTrade();
-    }	
+    }
+}
+
+sub party_handler
+{
+    my($hook, $args) = @_;
+    print("Hook: $hook\n");
+#   print(Dumper($args));
+
+    foreach my $key (@{$args->{KEYS}})
+    {
+        print("$key : $args->{$key} \n");
+    }
+    
+    print("============================\n");
 }
 
 1;
