@@ -4,6 +4,7 @@ package Please;
 use strict;
 use Data::Dumper;
 use Storable;
+use List::MoreUtils;
 
 # Kore includes
 use Plugins;
@@ -116,9 +117,15 @@ sub deal_finalize
 sub party_handler
 {
     my($hook, $args) = @_;
-    print("Hook: $hook\n");
-#   print(Dumper($args));
 
+    # Type 1 means someone disconnected!
+    if($args->{type} == 1)
+    {
+        # Automatically kick users when they disconnect
+        my $index = List::MoreUtils::firstidx { $_ eq $args->{ID} } @partyUsersID;
+        Commands::run("party kick $index");
+    }
+    
     foreach my $key (@{$args->{KEYS}})
     {
         print("$key : $args->{$key} \n");
