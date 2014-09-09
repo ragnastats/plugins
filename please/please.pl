@@ -67,9 +67,9 @@ sub parseChat
         }
     }
         
-    if($chat->{Msg} =~ m/\b(sit|stand|kis|lv|heh|no1|rice|gg|fsh|awsm|slur|ho|thx|omg|go|sob|pif|meh|shy|spin|fsh|sigh|dum|hum|oops|spit|panic|follow|look (?:[0-9]+))\b/ and $please->{$chat->{MsgUser}}->{timeout} > $time)
+    if($chat->{Msg} =~ m/\b(sit|stand|kis|lv|heh|no1|rice|gg|fsh|awsm|slur|ho|thx|omg|go|sob|pif|meh|shy|spin|fsh|sigh|dum|hum|oops|spit|panic|follow|look (?:[0-9]+))\b/i and $please->{$chat->{MsgUser}}->{timeout} > $time)
     {
-        my ($request, $option) = split(' ', $1);
+        my ($request, $option) = split(' ', lc($1));
 
         if($request eq "sit" or $request eq "stand")
         {
