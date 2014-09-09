@@ -12,6 +12,7 @@ use Globals;
 use Match;
 
 our $please = {};
+our $party = ['Fiolina', 'Dowlie', 'SourSadnessBear', 'Goddess Etro', 'One Man Band', 'Faye Romani', 'Friendly', 'Librarianna', 'Poof~'];
 
 
 Plugins::register("Please", "Everything Please?", \&unload);
@@ -123,15 +124,23 @@ sub party_handler
     {
         # Automatically kick users when they disconnect
         my $index = List::MoreUtils::firstidx { $_ eq $args->{ID} } @partyUsersID;
-        Commands::run("party kick $index");
+        my $user = $char->{'party'}{'users'}{$args->{ID}}{'name'};
+        
+        # Don't kick people from our array of official party members
+        unless(in_array($party, $user))
+        {
+            Commands::run("party kick $index");
+        }
     }
-    
-    foreach my $key (@{$args->{KEYS}})
-    {
-        print("$key : $args->{$key} \n");
+}
+
+
+sub in_array {
+    my ($arr,$search_for) = @_;
+    foreach my $value (@$arr) {
+        return 1 if $value eq $search_for;
     }
-    
-    print("============================\n");
+    return 0;
 }
 
 1;
