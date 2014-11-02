@@ -12,7 +12,7 @@ use Globals;
 use Match;
 
 our $please = {};
-our $party = ['Fiolina', 'Dowlie', 'SourSadnessBear', 'Goddess Etro', 'One Man Band', 'Faye Romani', 'Friendly', 'Librarianna', 'Poof~'];
+our $party = ['Fiolina', 'Dowlie', 'SourSadnessBear', 'Goddess Etro', 'One Man Band', 'Faye Romani', 'Friendly', 'Librarianna', 'Poof~', 'Tea Zone'];
 
 
 Plugins::register("Please", "Everything Please?", \&unload);
