@@ -30,7 +30,7 @@ sub check_admins
 {
     if($config{botspot_admins})
     {
-        return split(/,\s+/, $config{botspot_admins});
+        return split(/,\s*/, $config{botspot_admins});
     }
     else
     {
