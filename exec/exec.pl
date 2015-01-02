@@ -30,7 +30,7 @@ sub check_admins
 {
     if($config{botspot_admins})
     {
-        return split(/,\s*/, $config{botspot_admins});
+        return [split(/,\s*/, $config{botspot_admins})];
     }
     else
     {
@@ -76,7 +76,7 @@ sub parseChat
 			
 		$user = $args->{'MsgUser'};
 		$message = $args->{'Msg'};
-		
+        
 		if(in_array($admins, $user))
 		{
 			my $name = $char->name;
@@ -115,10 +115,13 @@ sub parseRoute
 	}
 }
 
-sub in_array {
-    my ($arr,$search_for) = @_;
-    foreach my $value (@$arr) {
-        return 1 if $value eq $search_for;
+sub in_array
+{
+    my($array, $search) = @_;
+
+    foreach my $value (@$array) {
+        return 1 if $value eq $search;
     }
+    
     return 0;
 }
