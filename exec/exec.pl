@@ -52,16 +52,11 @@ sub loop
         # When a move is requested, check if the current time is greater.
         if($exec->{move}->{requestedBy} and $exec->{move}->{timeout} and $time > $exec->{move}->{timeout})
         {
-            print("Time: $time\n");
-            print("Input \n");
-            print(Dumper($exec->{move}));
             my $pos = calcPosition($char);
             Commands::run("pm '$exec->{move}->{requestedBy}' Arrived at $pos->{x}, $pos->{y}");
 
             delete $exec->{move}->{timeout};
             delete $exec->{move}->{requestedBy};
-            print("Output \n");
-            print(Dumper($exec->{move}));
         }
     }
 }
