@@ -14,7 +14,6 @@ use Network;
 use Globals;
 use Utils;
 
-my $admins = check_admins();
 my $exec = {};
 
 Plugins::register("Exec", "Arbitrary Command Execution is FUN!", \&unload);
@@ -27,7 +26,7 @@ my $hooks = Plugins::addHooks(['mainLoop_post', \&loop],
 
 # This function parses the admin list from openkore's config
 sub check_admins
-{
+{    
     if($config{botspot_admins})
     {
         return [split(/,\s*/, $config{botspot_admins})];
@@ -67,7 +66,8 @@ sub parseChat
     {
         my($hook, $args) = @_;
         my($message, $user);
-            
+        my $admins = check_admins();
+
         $user = $args->{'MsgUser'};
         $message = $args->{'Msg'};
         
