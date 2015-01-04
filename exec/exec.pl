@@ -27,9 +27,9 @@ my $hooks = Plugins::addHooks(['mainLoop_post', \&loop],
 # This function parses the admin list from openkore's config
 sub check_admins
 {    
-    if($config{botspot_admins})
+    if($config{exec_admins})
     {
-        return [split(/,\s*/, $config{botspot_admins})];
+        return [split(/,\s*/, $config{exec_admins})];
     }
     else
     {
@@ -44,7 +44,7 @@ sub unload
 
 sub loop
 {
-    if(!$config{botspot_admin})
+    if(!$config{exec_ignore})
     {
         my $time = Time::HiRes::time();
 
@@ -62,7 +62,7 @@ sub loop
  
 sub parseChat
 {
-    if(!$config{botspot_admin})
+    if(!$config{exec_ignore})
     {
         my($hook, $args) = @_;
         my($message, $user);
@@ -98,7 +98,7 @@ sub parseChat
 
 sub parseRoute
 {
-    if(!$config{botspot_admin})
+    if(!$config{exec_ignore})
     {
         # Only set the move timeout when requested
         if($exec->{move}->{requestedBy})
