@@ -22,11 +22,9 @@ my $hooks = Plugins::addHooks(['mainLoop_post', \&loop]);
 
 sub plop
 {
-	my($command, $count) = @_;	
-	
-	for(my $i = 1; $i <= $count; $i++)
+	// Atempt to add all items into your storage (iRO only allows 100 items in your inventory at once)
+	for(my $i = 1; $i <= 100; $i++)
 	{
-#		print("Wow $1 !\n");
 		Commands::run("storage add $i");
 	}
 }
